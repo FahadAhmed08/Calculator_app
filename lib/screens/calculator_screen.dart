@@ -30,22 +30,8 @@ class CalculatorScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const HistoryScreen(),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOut;
-
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-
-                      return SlideTransition(
-                          position: offsetAnimation, child: child);
-                    },
+                  MaterialPageRoute(
+                    builder: (context) => const HistoryScreen(),
                   ),
                 );
               },
@@ -67,31 +53,27 @@ class CalculatorScreen extends StatelessWidget {
                   itemCount: calculatorProvider.history.length,
                   itemBuilder: (context, index) {
                     final item = calculatorProvider.history[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 0.0),
-                        title: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              item['expression']!,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: isSmallScreen ? 18 : 22,
-                              ),
+                    return ListTile(
+                      contentPadding: const EdgeInsets.all(0.0),
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            item['expression']!,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isSmallScreen ? 18 : 22,
                             ),
-                            Text(
-                              '=${item['result']}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: isSmallScreen ? 18 : 22,
-                              ),
+                          ),
+                          Text(
+                            '=${item['result']}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isSmallScreen ? 18 : 22,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -99,75 +81,72 @@ class CalculatorScreen extends StatelessWidget {
               ),
             ),
           Expanded(
-            flex: 3,
+            flex: 5,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (calculatorProvider.expression.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              right: 20,
-                            ),
-                            child: Text(
-                              calculatorProvider.expression,
-                              style: TextStyle(
-                                fontSize: calculatorProvider.isResultFinalized
-                                    ? 30
-                                    : calculatorProvider.expression.length <= 40
-                                        ? (isSmallScreen ? 35 : 50)
-                                        : (isSmallScreen ? 25 : 30),
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            right: 20.0,
-                          ),
-                          child: Text(
-                            calculatorProvider.expression.isEmpty
-                                ? '0'
-                                : "=${calculatorProvider.result}",
-                            style: TextStyle(
-                              fontSize: calculatorProvider.expression.isEmpty
-                                  ? (isSmallScreen ? 50 : 60)
-                                  : calculatorProvider.isResultFinalized
-                                      ? (isSmallScreen ? 40 : 50)
-                                      : (isSmallScreen ? 30 : 35),
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal,
-                            ),
+                Column(
+                  // mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (calculatorProvider.expression.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          right: 20,
+                        ),
+                        child: Text(
+                          calculatorProvider.expression,
+                          style: TextStyle(
+                            fontSize: calculatorProvider.isResultFinalized
+                                ? 30
+                                : calculatorProvider.expression.length <= 40
+                                    ? (isSmallScreen ? 35 : 50)
+                                    : (isSmallScreen ? 25 : 30),
+                            color: Colors.white,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
-                      ],
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        // bottom: 5,
+                        right: 20.0,
+                      ),
+                      child: Text(
+                        calculatorProvider.expression.isEmpty
+                            ? '0'
+                            : "=${calculatorProvider.result}",
+                        style: TextStyle(
+                          fontSize: calculatorProvider.expression.isEmpty
+                              ? (isSmallScreen ? 50 : 60)
+                              : calculatorProvider.isResultFinalized
+                                  ? (isSmallScreen ? 40 : 50)
+                                  : (isSmallScreen ? 30 : 35),
+                          color: Colors.white,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 0.0),
+                  padding: EdgeInsets.only(top: 0.0),
                   child:
                       Divider(height: 2, thickness: 0, color: Colors.white54),
                 ),
                 for (var row in _buildButtonRows(calculatorProvider,
                     Provider.of<HistoryProvider>(context), isSmallScreen))
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  SizedBox(
+                    height: 90,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: row,
                     ),
                   ),
+                const SizedBox(
+                  height: 5,
+                )
               ],
             ),
           ),
@@ -190,22 +169,22 @@ List<List<Widget>> _buildButtonRows(CalculatorProvider calculatorProvider,
               calculatorProvider.clearExpression();
             }
           },
-          textColor: Colors.orange,
-          textSize: 35),
+          textColor: Colors.deepOrangeAccent,
+          textSize: 30),
       CalculatorButton(
           label: '⌫',
           onPressed: calculatorProvider.removeLast,
-          textColor: Colors.orange,
-          textSize: 25),
+          textColor: Colors.deepOrangeAccent,
+          textSize: 22),
       CalculatorButton(
           label: '%',
           onPressed: () => calculatorProvider.addCharacter('%'),
-          textColor: Colors.orange,
-          textSize: 35),
+          textColor: Colors.deepOrangeAccent,
+          textSize: 30),
       CalculatorButton(
           label: '÷',
           onPressed: () => calculatorProvider.addCharacter('÷'),
-          textColor: Colors.orange,
+          textColor: Colors.deepOrangeAccent,
           textSize: 35),
     ],
     [
@@ -224,7 +203,7 @@ List<List<Widget>> _buildButtonRows(CalculatorProvider calculatorProvider,
       CalculatorButton(
           label: '×',
           onPressed: () => calculatorProvider.addCharacter('×'),
-          textColor: Colors.orange,
+          textColor: Colors.deepOrangeAccent,
           textSize: 35),
     ],
     [
@@ -243,7 +222,7 @@ List<List<Widget>> _buildButtonRows(CalculatorProvider calculatorProvider,
       CalculatorButton(
           label: '-',
           onPressed: () => calculatorProvider.addCharacter('-'),
-          textColor: Colors.orange,
+          textColor: Colors.deepOrangeAccent,
           textSize: 35),
     ],
     [
@@ -262,15 +241,15 @@ List<List<Widget>> _buildButtonRows(CalculatorProvider calculatorProvider,
       CalculatorButton(
           label: '+',
           onPressed: () => calculatorProvider.addCharacter('+'),
-          textColor: Colors.orange,
+          textColor: Colors.deepOrangeAccent,
           textSize: 35),
     ],
     [
       CalculatorButton(
           label: 'AC',
           onPressed: calculatorProvider.clearAll,
-          textColor: Colors.orange,
-          textSize: 35),
+          textColor: Colors.deepOrangeAccent,
+          textSize: 30),
       CalculatorButton(
           label: '0',
           onPressed: () => calculatorProvider.addCharacter('0'),

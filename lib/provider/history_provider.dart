@@ -28,9 +28,14 @@ class HistoryProvider extends ChangeNotifier {
 
   void addToHistory(String expression, String result) {
     if (expression.isNotEmpty && result != 'Error') {
-      _history.add({'expression': expression, 'result': result});
-      saveHistory();
-      notifyListeners();
+      // Check if the last history entry is the same
+      if (_history.isEmpty ||
+          _history.last['expression'] != expression ||
+          _history.last['result'] != result) {
+        _history.add({'expression': expression, 'result': result});
+        saveHistory();
+        notifyListeners();
+      }
     }
   }
 
