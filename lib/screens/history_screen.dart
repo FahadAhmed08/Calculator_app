@@ -102,7 +102,7 @@ class HistoryScreen extends StatelessWidget {
               color: Colors.white54,
               thickness: 0,
               height: 10,
-              indent: 5,
+              indent: 10,
               endIndent: 5,
             ),
             const SizedBox(
