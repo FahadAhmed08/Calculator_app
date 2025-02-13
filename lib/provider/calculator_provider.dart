@@ -50,7 +50,6 @@ class CalculatorProvider extends ChangeNotifier {
 
   void addCharacter(String character) {
     if (_isResultFinalized) {
-      // Agar naya expression likhna start ho raha hai, toh pehle history me add karo
       if (shouldAddToHistory) {
         _history.add({'expression': _expression, 'result': _result});
         shouldAddToHistory = false; // Reset flag after adding to history
@@ -60,28 +59,44 @@ class CalculatorProvider extends ChangeNotifier {
       _isResultFinalized = false;
     }
 
+    // Ignore '0' if it's clicked alone
+    if (_expression.isEmpty && character == '0') {
+      return;
+    }
+
+    if (_expression == '0' &&
+        character != '+' &&
+        character != '-' &&
+        character != '×' &&
+        character != '÷') {
+      return;
+    }
+
     if (character == '%') {
       if (_expression.isNotEmpty && !_expression.endsWith('%')) {
-        _expression += character;
-        _calculateIntermediateResult();
+        RegExp regex = RegExp(r'(\d+(\.\d+)?)$');
+        Match? match = regex.firstMatch(_expression);
+
+        if (match != null) {
+          String lastNumber = match.group(0)!;
+          double percentageValue = double.parse(lastNumber) / 100;
+
+          _expression = _expression.substring(0, match.start) +
+              percentageValue.toString();
+
+          _result = _expression;
+        }
         notifyListeners();
       }
     } else {
-      if (_expression.isEmpty &&
-          (character == '+' ||
-              character == '-' ||
-              character == '×' ||
-              character == '÷')) {
+      if (_expression == '0' && RegExp(r'[1-9]').hasMatch(character)) {
+        _expression = character;
+      } else if (_expression.isEmpty &&
+          RegExp(r'[+\-×÷]').hasMatch(character)) {
         _expression = '0$character';
       } else if (_expression.isNotEmpty &&
-          (character == '+' ||
-              character == '-' ||
-              character == '×' ||
-              character == '÷') &&
-          (_expression.endsWith('+') ||
-              _expression.endsWith('-') ||
-              _expression.endsWith('×') ||
-              _expression.endsWith('÷'))) {
+          RegExp(r'[+\-×÷]').hasMatch(character) &&
+          RegExp(r'[+\-×÷]').hasMatch(_expression[_expression.length - 1])) {
         _expression =
             _expression.substring(0, _expression.length - 1) + character;
       } else if (_expression.length < maxExpressionLength) {
@@ -98,36 +113,29 @@ class CalculatorProvider extends ChangeNotifier {
     try {
       String expressionWithPercentage = _expression.replaceAll('%', '/100');
 
-      if (expressionWithPercentage.endsWith('+') ||
-          expressionWithPercentage.endsWith('-') ||
-          expressionWithPercentage.endsWith('×') ||
-          expressionWithPercentage.endsWith('÷')) {
-        _result = expressionWithPercentage.substring(
-            0, expressionWithPercentage.length - 1);
-      } else {
-        final parser = Parser();
-        final exp = parser.parse(
-            expressionWithPercentage.replaceAll('×', '*').replaceAll('÷', '/'));
-        final eval = exp.evaluate(EvaluationType.REAL, ContextModel());
-        _result =
-            (eval == eval.toInt()) ? eval.toInt().toString() : eval.toString();
+      // Agar last character operator hai, result update na karo
+      if (RegExp(r'[+\-×÷]$').hasMatch(expressionWithPercentage)) {
+        return;
       }
+
+      final parser = Parser();
+      final exp = parser.parse(
+          expressionWithPercentage.replaceAll('×', '*').replaceAll('÷', '/'));
+      final eval = exp.evaluate(EvaluationType.REAL, ContextModel());
+      _result =
+          (eval == eval.toInt()) ? eval.toInt().toString() : eval.toString();
     } catch (e) {
       _result = '0';
     }
   }
 
-// Calculate final result
+  // Calculate final result
   String calculateResult() {
     try {
       String expressionWithPercentage = _expression.replaceAll('%', '/100');
 
-      //  Last character agar operator ho to hata do
-      while (expressionWithPercentage.isNotEmpty &&
-          (expressionWithPercentage.endsWith('+') ||
-              expressionWithPercentage.endsWith('-') ||
-              expressionWithPercentage.endsWith('×') ||
-              expressionWithPercentage.endsWith('÷'))) {
+      // Agar last character operator hai, to hatao
+      while (RegExp(r'[+\-×÷]$').hasMatch(expressionWithPercentage)) {
         expressionWithPercentage = expressionWithPercentage.substring(
             0, expressionWithPercentage.length - 1);
       }
@@ -142,7 +150,7 @@ class CalculatorProvider extends ChangeNotifier {
         _result =
             (eval == eval.toInt()) ? eval.toInt().toString() : eval.toString();
         _isResultFinalized = true;
-        shouldAddToHistory = true; // Set flag to add to history on next input
+        shouldAddToHistory = true;
       }
     } catch (e) {
       _result = 'Error';
