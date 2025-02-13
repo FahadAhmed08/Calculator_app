@@ -173,6 +173,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 }
 
+// ignore: unused_element
 class _HistoryItem extends StatelessWidget {
   final String expression;
   final String result;
@@ -208,6 +209,7 @@ class _HistoryItem extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ExpressionDisplay extends StatelessWidget {
   final String expression;
   final String result;

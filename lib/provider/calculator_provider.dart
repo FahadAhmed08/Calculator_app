@@ -8,7 +8,7 @@ class CalculatorProvider extends ChangeNotifier {
   bool shouldAddToHistory = false; // Flag added
   List<Map<String, String>> _history = []; // History List
 
-  static const int maxExpressionLength = 11;
+  static const int maxExpressionLength = 10;
 
   // Getters
   String get expression => _expression;
@@ -122,7 +122,7 @@ class CalculatorProvider extends ChangeNotifier {
     try {
       String expressionWithPercentage = _expression.replaceAll('%', '/100');
 
-      // ✅ Last character agar operator ho to hata do
+      //  Last character agar operator ho to hata do
       while (expressionWithPercentage.isNotEmpty &&
           (expressionWithPercentage.endsWith('+') ||
               expressionWithPercentage.endsWith('-') ||
