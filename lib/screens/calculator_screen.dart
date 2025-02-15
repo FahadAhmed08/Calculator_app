@@ -4,6 +4,7 @@ import 'package:calculator_3/screens/history_screen.dart';
 import 'package:calculator_3/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
@@ -115,12 +116,26 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                               child: Text(
                                 calculatorProvider.expression,
                                 style: TextStyle(
-                                  fontSize: calculatorProvider.isResultFinalized
-                                      ? 30
-                                      : calculatorProvider.expression.length <=
-                                              40
-                                          ? (isSmallScreen ? 35 : 50)
-                                          : (isSmallScreen ? 25 : 30),
+                                  fontSize:
+                                      calculatorProvider.expression.length <= 12
+                                          ? (isSmallScreen ? 20.0 : 55.0)
+                                          : (isSmallScreen
+                                              ? (20 -
+                                                      ((calculatorProvider
+                                                                  .expression
+                                                                  .length -
+                                                              13) *
+                                                          2))
+                                                  .clamp(10, 20)
+                                                  .toDouble()
+                                              : (50 -
+                                                      ((calculatorProvider
+                                                                  .expression
+                                                                  .length -
+                                                              13) *
+                                                          2))
+                                                  .clamp(10, 50)
+                                                  .toDouble()),
                                   color: Colors.white,
                                 ),
                               ),
@@ -214,17 +229,27 @@ class _ExpressionDisplay extends StatelessWidget {
   final String expression;
   final String result;
   final bool isResultFinalized;
-  final bool isSmallScreen;
 
   const _ExpressionDisplay({
     required this.expression,
     required this.result,
     required this.isResultFinalized,
-    required this.isSmallScreen,
   });
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double calculateFontSize() {
+      int length = expression.length;
+      bool isSmallScreen =
+          screenWidth < 400; // 400px se chhoti screen small mani jayegi
+
+      return length <= 11
+          ? (isSmallScreen ? 40 : 60)
+          : (isSmallScreen ? 20 : 40);
+    }
+
     return Padding(
       padding: const EdgeInsets.only(right: 15),
       child: Column(
@@ -236,25 +261,21 @@ class _ExpressionDisplay extends StatelessWidget {
               child: Text(
                 expression,
                 style: TextStyle(
-                  fontSize: isResultFinalized
-                      ? 30
-                      : expression.length <= 40
-                          ? (isSmallScreen ? 35 : 50)
-                          : (isSmallScreen ? 25 : 30),
+                  fontSize: calculateFontSize(),
                   color: Colors.white,
                 ),
+                textAlign: TextAlign.right,
               ),
             ),
           Text(
             expression.isEmpty ? '0' : "=$result",
             style: TextStyle(
-              fontSize: expression.isEmpty
-                  ? (isSmallScreen ? 50 : 60)
-                  : isResultFinalized
-                      ? (isSmallScreen ? 40 : 50)
-                      : (isSmallScreen ? 30 : 35),
+              fontSize: isResultFinalized
+                  ? (screenWidth < 400 ? 40 : 50)
+                  : (screenWidth < 400 ? 30 : 35),
               color: Colors.white,
             ),
+            textAlign: TextAlign.right,
           ),
         ],
       ),
