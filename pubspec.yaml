@@ -39,7 +39,7 @@ dependencies:
   provider: ^6.1.2
   math_expressions: ^2.6.0
   shared_preferences: ^2.3.3
-  auto_size_text: ^3.0.0
+  # auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:

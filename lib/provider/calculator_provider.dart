@@ -9,7 +9,7 @@ class CalculatorProvider extends ChangeNotifier {
   List<Map<String, String>> _history = []; // Stores calculation history
 
   static const int maxExpressionLength =
-      16; // Maximum allowed expression length
+      13; // Maximum allowed expression length
 
   // Getters for private variables
   String get expression => _expression;
